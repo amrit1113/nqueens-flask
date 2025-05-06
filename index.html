@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-Queens Solver</title>
+    <style>
+        body {
+            overflow-x: hidden;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background: #2c3e50;
+            color: #ecf0f1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        form {
+            margin: 20px 0;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        label {
+            font-size: 1.2rem;
+        }
+        input[type="number"] {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 80px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        #solution {
+            font-size: 1.2rem;
+            color: #16a085;
+            margin: 20px 0;
+        }
+        .chessboard {
+            display: grid;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 2px;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+        .cell:hover {
+            transform: scale(1.1);
+        }
+        .white {
+            background-color: #f0d9b5;
+        }
+        .black {
+            background-color: #b58863;
+        }
+        .queen {
+            color: red;
+        }
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>N-Queens Problem Solver</h1>
+    </header>
+    <form id="solveForm">
+        <label for="n">Enter Board Size (N):</label>
+        <input type="number" id="n" min="4" required>
+        <button type="submit">Solve</button>
+    </form>
+    <div id="solution"></div>
+    <div id="iterations"></div>
+    <div id="conflicts"></div>
+    <div id="chessboard" class="chessboard"></div>
+    <footer>
+        <p>Developed with ❤ by AAAAC Innovators</p>
+    </footer>
+
+    <script>
+        document.getElementById('solveForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const n = parseInt(document.getElementById('n').value);
+            const solutionDiv = document.getElementById('solution');
+            const iterationsDiv = document.getElementById('iterations');
+            const conflictsDiv = document.getElementById('conflicts');
+            const chessboardDiv = document.getElementById('chessboard');
+
+            solutionDiv.textContent = 'Solving...';
+            iterationsDiv.textContent = '';
+            conflictsDiv.textContent = '';
+            chessboardDiv.innerHTML = '';
+
+            const response = await fetch('https://nqueens-flask.onrender.com/solve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ n })
+            });
+
+            const data = await response.json();
+            const solution = data.solution;
+            const iterations = data.iterations;
+            const conflicts = data.conflicts;
+
+            if (solution && solution.length) {
+                const solutionArray = solution.join(', ');
+                solutionDiv.textContent = `Solution found. Solution array: [${solutionArray}]`;
+                iterationsDiv.textContent = `Iterations: ${iterations}`;
+                conflictsDiv.textContent = `Conflicts: ${conflicts}`;
+                displayChessboard(solution, n);
+            } else {
+                solutionDiv.textContent = 'No solution found!';
+            }
+        });
+
+        function displayChessboard(solution, n) {
+            const chessboard = document.getElementById('chessboard');
+            chessboard.style.gridTemplateColumns = `repeat(${n}, 50px)`;
+            chessboard.style.gridTemplateRows = `repeat(${n}, 50px)`;
+
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = `cell ${((i + j) % 2 === 0) ? 'white' : 'black'}`;
+                    if (solution[i] === j) {
+                        const queen = document.createElement('span');
+                        queen.className = 'queen';
+                        queen.textContent = '♛';
+                        cell.appendChild(queen);
+                    }
+                    chessboard.appendChild(cell);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
