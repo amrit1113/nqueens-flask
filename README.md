@@ -1,3 +1,4 @@
+Live Demo-https://nqueens-flask.onrender.com/
 # 🧠 N-Queens Solver using Particle Swarm Optimization (PSO)
 
 This is a web-based application that solves the N-Queens problem using the **Particle Swarm Optimization (PSO)** algorithm. Built using **Flask**, it allows users to input any number of queens (`n`) and visualizes the solution on an `n × n` chessboard.
